@@ -1,0 +1,4 @@
+interface:
+  display_name: "Onboard"
+  short_description: "Source-backed onboarding onto a ticket, PR, or doc"
+  default_prompt: "onboard me on <ticket, PR, or doc URL>"

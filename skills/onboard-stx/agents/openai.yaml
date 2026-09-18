@@ -1,4 +1,0 @@
-interface:
-  display_name: "Onboard STX"
-  short_description: "Source-backed STX Jira and PR onboarding"
-  default_prompt: "onboard stx on <Jira ticket or PR URL>"

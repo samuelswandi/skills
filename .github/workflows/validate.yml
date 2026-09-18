@@ -28,9 +28,45 @@ jobs:
           output=$(npx --yes skills@1 add . --list 2>&1)
           echo "$output"
 
-          for skill in pr onboard-stx; do
-            if ! grep -q "$skill" <<< "$output"; then
+          # Derive the expected list from disk rather than hardcoding it, so
+          # adding a skill cannot silently skip this check.
+          rc=0
+          while IFS= read -r skill; do
+            if ! grep -qF "$skill" <<< "$output"; then
               echo "::error::skills CLI did not discover '$skill'"
-              exit 1
+              rc=1
             fi
-          done
+          done < <(find skills -mindepth 2 -maxdepth 4 -name SKILL.md \
+                     | sed 's|^skills/||; s|/SKILL.md$||' | sort)
+          exit "$rc"
+
+      - name: Confirm the onboard variant generator produces a valid skill
+        run: |
+          # The generator must emit a skill the CLI can actually discover.
+          # --project writes relative to the current directory.
+          skills/onboard/scripts/generate-variant.sh testorg --project
+          test -f .claude/skills/onboard-testorg/SKILL.md
+
+          generated=$(npx --yes skills@1 add ./.claude/skills/onboard-testorg --list 2>&1)
+          echo "$generated"
+          if ! grep -qF 'onboard-testorg' <<< "$generated"; then
+            echo "::error::generated variant is not a discoverable skill"
+            exit 1
+          fi
+
+          # Placeholders are expected fresh out of the generator; confirm they
+          # are present so the agent has something concrete to fill in.
+          if ! grep -q 'FILL:' .claude/skills/onboard-testorg/SKILL.md; then
+            echo "::error::generated variant has no FILL placeholders to complete"
+            exit 1
+          fi
+
+          # The generated name must match its directory, or the skill is invalid.
+          name=$(awk 'NR>1 && /^name: /{sub(/^name: /, ""); print; exit}' \
+                   .claude/skills/onboard-testorg/SKILL.md)
+          if [ "$name" != "onboard-testorg" ]; then
+            echo "::error::generated name '$name' does not match its directory"
+            exit 1
+          fi
+
+          rm -rf .claude/skills/onboard-testorg

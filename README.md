@@ -56,7 +56,7 @@ npx skills update
 | Skill | Description |
 | ----- | ----------- |
 | [`comms`](skills/comms/) | Communication and collaboration preferences covering how to write for the user, explain technical detail precisely, surface assumptions, handle unknowns, and make verification claims. Use when drafting or editing any user-facing prose — replies, progress updates, explanations, PR and ticket descriptions, commit messages, documents — and when deciding how much depth an answer needs, whether to ask or assume, or what a passing check actually proves. |
-| [`onboard-stx`](skills/onboard-stx/) | Onboard the user to a StraitsX/Fazz engineering ticket, Jira issue, GitHub PR, or dashboard task by tracing the live source into the relevant xfers repository before implementation. Use when the user says onboard-stx, asks to onboard on an STX/Fazz/Jira/GitHub task, or wants the product behavior, code path, scope, and open questions explained first. |
+| [`onboard`](skills/onboard/) | Build a source-backed understanding of one task before implementing it — read the live ticket, PR, or doc first, trace the code path, then explain the product behavior, scope, and open questions. Use when the user says onboard, asks to be onboarded or brought up to speed on a ticket, Jira issue, Linear issue, GitHub PR, Notion doc, or bug report, or wants a task explained before any code is written. On first use in a new organization, generates a customized onboard-<org> skill wired to that org's own systems. |
 | [`pr`](skills/pr/) | Use when opening, updating, submitting, or preparing a GitHub pull request from Claude or Codex in this repository, especially when the user asks for /pr, $pr, or the PR workflow. |
 <!-- skills:end -->
 
@@ -78,11 +78,20 @@ your agent's instruction file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`) — 
 rules, different mechanism. As a skill it loads when the task looks like writing;
 in an instruction file it's always in context.
 
-Note on `onboard-stx`: it's written around StraitsX/Fazz internal systems (Jira,
-`payfazz/xfers`), so it's only useful if you work there. It's published here
-because the shape — read the live source first, trace the code path, explain at
-the user's altitude, stop before implementing — adapts well to any org. Fork it
-and swap the systems.
+`onboard` starts generic and specializes itself. The first time you use it, it
+onboards you onto whatever you pointed it at, then offers to generate an
+`onboard-<org>` skill wired to the systems it just used — your tracker, your
+repositories, your docs. Accept and you get a second skill in
+`~/.claude/skills/onboard-acme/` that already knows where to look, so later
+sessions skip the discovery:
+
+```bash
+npx skills add samuelswandi/skills --skill onboard -g
+```
+
+The generic skill stays installed and keeps working for one-off tasks outside that
+org. The variant lives only on your machine, since it encodes your project keys and
+checkout paths — nothing about your setup comes back here.
 
 ## Layout
 
@@ -92,6 +101,7 @@ skills/
     SKILL.md          # required: YAML frontmatter + instructions
     agents/           # optional: per-agent interface metadata
     scripts/          # optional: helper scripts the skill invokes
+    templates/        # optional: files the skill generates from
 ```
 
 `SKILL.md` needs `name` and `description` in its frontmatter:
