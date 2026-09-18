@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace-manifest.json",
+  "name": "samuelswandi-skills",
+  "description": "Samuel Swandi's personal collection of agent skills.",
+  "owner": {
+    "name": "samuelswandi",
+    "url": "https://github.com/samuelswandi"
+  },
+  "plugins": [
+    {
+      "name": "samuelswandi-skills",
+      "source": "./",
+      "description": "Personal agent skills: PR workflow and StraitsX task onboarding.",
+      "license": "MIT",
+      "keywords": ["skills", "pr", "workflow", "onboarding"],
+      "skills": ["./skills/pr", "./skills/onboard-stx"]
+    }
+  ]
+}

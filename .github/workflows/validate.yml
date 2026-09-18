@@ -1,0 +1,36 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate skill frontmatter and scan for secrets
+        run: ./scripts/validate.sh
+
+      - name: Check the README skills table is current
+        run: ./scripts/sync-readme.sh --check
+
+      - name: Confirm the skills CLI can discover every skill
+        run: |
+          # Install from this checkout the same way a consumer would, so a
+          # layout or frontmatter change that breaks discovery fails here.
+          output=$(npx --yes skills@1 add . --list 2>&1)
+          echo "$output"
+
+          for skill in pr onboard-stx; do
+            if ! grep -q "$skill" <<< "$output"; then
+              echo "::error::skills CLI did not discover '$skill'"
+              exit 1
+            fi
+          done

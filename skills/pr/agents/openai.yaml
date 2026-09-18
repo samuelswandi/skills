@@ -1,0 +1,4 @@
+interface:
+  display_name: "pr"
+  short_description: "Run the canonical repository PR workflow"
+  default_prompt: "Use $pr to open or update this branch as a pull request."
