@@ -10,10 +10,10 @@
     {
       "name": "samuelswandi-skills",
       "source": "./",
-      "description": "Personal agent skills: communication preferences, PR workflow, and task onboarding.",
+      "description": "Personal agent skills for communication, PRs, task onboarding, and iterative work logbooks.",
       "license": "MIT",
       "keywords": ["skills", "pr", "workflow", "onboarding", "writing", "communication"],
-      "skills": ["./skills/comms", "./skills/onboard", "./skills/pr"]
+      "skills": ["./skills/comms", "./skills/logbook", "./skills/onboard", "./skills/pr"]
     }
   ]
 }
